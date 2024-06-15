@@ -1,14 +1,13 @@
--- Now, we will create a query to list the Glam rock bands ranked by their longevity
-
-SELECT
-    band_name,
-    CASE
-        WHEN split IS NULL OR split = 0 THEN 2022 - formed
-        ELSE split - formed
+-- list_glam_rock_bands.sql
+SELECT 
+    band_name, 
+    CASE 
+        WHEN split IS NULL THEN 2022 - formed 
+        ELSE split - formed 
     END AS lifespan
-FROM
+FROM 
     metal_bands
-WHERE
+WHERE 
     style = 'Glam rock'
-ORDER BY
+ORDER BY 
     lifespan DESC;
