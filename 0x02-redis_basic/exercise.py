@@ -63,3 +63,23 @@ class Cache:
         if value is not None and isNaN(value) is False:
             value = int(value)
         return value
+
+def replay(method: Callable) -> None:
+    redis_client = method.__self__._redis
+    calls_key = f"{method.__qualname__}:calls"
+    inputs_key = f"{method.__qualname__}:inputs"
+    outputs_key = f"{method.__qualname__}:outputs"
+
+    num_calls = redis_client.get(calls_key)
+    if num_calls is None:
+        print(f"{method.__qualname__} was never called.")
+        return
+
+    num_calls = int(num_calls)
+    print(f"{method.__qualname__} was called {num_calls} times:")
+
+    inputs = redis_client.lrange(inputs_key, 0, -1)
+    outputs = redis_client.lrange(outputs_key, 0, -1)
+
+    for input_args, output in zip(inputs, outputs):
+        print(f"{method.__qualname__}(*{input_args.decode('utf-8')}) -> {output.decode('utf-8')}")
